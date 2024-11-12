@@ -1,0 +1,5 @@
+opencv-python
+pytesseract
+transformers
+torch  # Required for transformers to run summaries
+Pillow
