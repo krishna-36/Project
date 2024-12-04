@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Summarizer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='design.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Video Summarizer</h1>
+            <p>Upload your video and get a summarized version.</p>
+        </header>
+        <main>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <input type="file" id="videoInput" name="video" accept="video/*" required>
+                <button type="submit">Summarize Video</button>
+            </form>
+
+            <!-- Loading and Progress Section -->
+            <div id="loading" class="loading" style="display: none;">Processing your video...</div>
+            <div id="progressWrapper" style="display:none;">
+                <div id="progressBar" style="width: 0%; height: 30px; background-color: green;"></div>
+            </div>
+
+            <!-- Summary Section -->
+            <div id="summary" class="summary">
+                <h2>Summary:</h2>
+                <p id="summaryText"></p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Handle the form submission
+        const form = document.getElementById("uploadForm");
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const formData = new FormData(form);
+
+            // Show loading and progress bar
+            document.getElementById("loading").style.display = "block";
+            document.getElementById("progressWrapper").style.display = "block";
+            document.getElementById("progressBar").style.width = "0%";
+
+            try {
+                // Send video file to the server
+                const response = await fetch("/summarize", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                // Listen for progress updates
+                const eventSource = new EventSource("/progress");
+                eventSource.onmessage = function (event) {
+                    const progress = parseInt(event.data);
+                    document.getElementById("progressBar").style.width = `${progress}%`;
+
+                    if (progress === 100) {
+                        eventSource.close();
+                    }
+                };
+
+                // Wait for summary response
+                const result = await response.json();
+                if (result.summary) {
+                    document.getElementById("summaryText").innerText = result.summary;
+                } else {
+                    document.getElementById("summaryText").innerText = "Error: " + result.error;
+                }
+            } catch (error) {
+                document.getElementById("summaryText").innerText = "Error: " + error.message;
+            } finally {
+                document.getElementById("loading").style.display = "none"; // Hide loading
+            }
+        });
+    </script>
+</body>
+</html>
