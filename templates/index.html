@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Summarizer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='design.css') }}">
+</head>
+<body>  
+    <div class="container">
+        <header>
+            <h1>Video Summarizer</h1>
+            <p>Upload your video and get a summarized version.</p>
+        </header>
+        <main>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <input type="file" id="videoInput" name="video" accept="video/*" required>
+                <button type="submit">Summarize Video</button>
+            </form>
+
+            <!-- Loading and Progress Section -->
+            <div id="loading" class="loading" style="display: none;">Processing your video...</div>
+            <div id="progressWrapper" style="display:none;">
+                <div id="progressBar" style="width: 0%; height: 30px; background-color: green;"></div>
+            </div>
+
+            <!-- Summary Section -->
+            <div id="summary" class="summary">
+                <p id="summaryText"></p>
+            </div>
+
+            <!-- Download Button Section -->
+            <div id="downloadSection" style="display: none;">
+                <button id="downloadTranscriptButton" onclick="downloadTranscript()">Download Transcript</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Link to the script.js file -->
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</body>
+</html>
